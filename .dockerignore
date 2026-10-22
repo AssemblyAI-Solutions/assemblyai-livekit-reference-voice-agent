@@ -23,6 +23,8 @@ tests/
 README.md
 LICENSE
 
-# Coding agent guidance
+# Coding agent guidance and skills
 AGENTS.md
 CLAUDE.md
+.claude/
+skills/
