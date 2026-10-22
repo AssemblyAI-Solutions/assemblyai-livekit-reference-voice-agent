@@ -1,4 +1,4 @@
-# AssemblyAI medical receptionist voice agent for LiveKit
+# AssemblyAI reference voice agent for LiveKit
 
 A starter voice agent built with [LiveKit Agents](https://github.com/livekit/agents), where every model is from AssemblyAI and runs on one API key. Keegan, the receptionist, answers the phone for a made-up clinic, Riverside Family Medicine: taking a new patient's intake details or looking up a returning patient, finding an open time and booking the appointment.
 
@@ -8,22 +8,7 @@ A starter voice agent built with [LiveKit Agents](https://github.com/livekit/age
 | **Brain** | [LLM Gateway](https://www.assemblyai.com/docs/llm-gateway/quickstart) | Runs the conversation and calls the clinic's tools, with your choice of model from Google, OpenAI, Anthropic and others |
 | **Voice** | [Streaming text-to-speech](https://www.assemblyai.com/docs/tts/getting-started/quickstart) | Speaks the replies, with word timings so interruptions are recorded accurately |
 
-```mermaid
-flowchart LR
-  caller(("Caller")) -- audio --> stt["Universal-3.6 Pro<br/>Medical Mode + end of turn"]
-  stt -- transcript --> llm["LLM Gateway<br/>gemma-4-31b"]
-  llm <-. tool calls .-> clinic["Clinic<br/>patients and schedule"]
-  llm -- reply text --> tts["AssemblyAI TTS"]
-  tts -- audio --> caller
-```
-
 It's a small, complete starting point: one agent, four tools, a made-up clinic to run them against, tests, and a Dockerfile for deploying to [LiveKit Cloud](https://cloud.livekit.io). Fork it and make it yours.
-
-> [!NOTE]
-> The AssemblyAI TTS plugin for LiveKit is in a pull request that hasn't been released yet, [livekit/agents#8040](https://github.com/livekit/agents/pull/8040). Until it is, `pyproject.toml` installs LiveKit Agents and its plugins from [the branch that adds it](https://github.com/dlange-aai/agents/tree/feat/assemblyai-tts). Once it's on PyPI, delete the `[tool.uv.sources]` table and run `uv lock`.
-
-> [!IMPORTANT]
-> This is a demo with made-up patients and a made-up schedule. Before a real patient's health information goes through it, you need a Business Associate Agreement (BAA) with every service that processes it, a HIPAA-compliant setup for storage and logs, and a real practice management or EHR system behind the tools. The receptionist doesn't give medical advice, and sends callers who describe an emergency to 911.
 
 ## Quickstart
 
