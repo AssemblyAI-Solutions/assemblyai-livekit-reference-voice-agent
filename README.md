@@ -1,8 +1,8 @@
 # AssemblyAI medical receptionist voice agent for LiveKit
 
-A starter voice agent built with [LiveKit Agents](https://github.com/livekit/agents), where every model is from AssemblyAI and runs on one API key. Ava answers the phone for a made-up clinic, Riverside Family Medicine. She takes a new patient's intake details or looks up a returning patient, finds an open time and books the appointment.
+A starter voice agent built with [LiveKit Agents](https://github.com/livekit/agents), where every model is from AssemblyAI and runs on one API key. Keegan, the receptionist, answers the phone for a made-up clinic, Riverside Family Medicine: taking a new patient's intake details or looking up a returning patient, finding an open time and booking the appointment.
 
-| | AssemblyAI service | What it does for Ava |
+| | AssemblyAI service | What it does for the receptionist |
 |---|---|---|
 | **Ears** | [Universal-3.6 Pro streaming speech-to-text](https://www.assemblyai.com/docs/voice-agents/livekit-universal-3-6-pro), with [Medical Mode](https://www.assemblyai.com/docs/streaming/medical-mode) | Transcribes the caller, including drug names, doses and member IDs, and decides when they've finished their turn |
 | **Brain** | [LLM Gateway](https://www.assemblyai.com/docs/llm-gateway/quickstart) | Runs the conversation and calls the clinic's tools, with your choice of model from Google, OpenAI, Anthropic and others |
@@ -23,7 +23,7 @@ It's a small, complete starting point: one agent, four tools, a made-up clinic t
 > The AssemblyAI TTS plugin for LiveKit is in a pull request that hasn't been released yet, [livekit/agents#8040](https://github.com/livekit/agents/pull/8040). Until it is, `pyproject.toml` installs LiveKit Agents and its plugins from [the branch that adds it](https://github.com/dlange-aai/agents/tree/feat/assemblyai-tts). Once it's on PyPI, delete the `[tool.uv.sources]` table and run `uv lock`.
 
 > [!IMPORTANT]
-> This is a demo with made-up patients and a made-up schedule. Before a real patient's health information goes through it, you need a Business Associate Agreement (BAA) with every service that processes it, a HIPAA-compliant setup for storage and logs, and a real practice management or EHR system behind the tools. Ava is a receptionist: she doesn't give medical advice, and she sends callers who describe an emergency to 911.
+> This is a demo with made-up patients and a made-up schedule. Before a real patient's health information goes through it, you need a Business Associate Agreement (BAA) with every service that processes it, a HIPAA-compliant setup for storage and logs, and a real practice management or EHR system behind the tools. The receptionist doesn't give medical advice, and sends callers who describe an emergency to 911.
 
 ## Quickstart
 
@@ -36,26 +36,26 @@ uv sync
 cp .env.example .env.local
 ```
 
-Put your AssemblyAI API key in `.env.local`, then call Ava from your terminal:
+Put your AssemblyAI API key in `.env.local`, then call the receptionist from your terminal:
 
 ```console
 lk agent console
 ```
 
-Console mode uses your computer's microphone and speakers, and needs only the AssemblyAI key. Use headphones, so Ava doesn't hear herself, or add `--text` to type instead of talk. Without the LiveKit CLI, `uv run src/agent.py console` does the same.
+Console mode uses your computer's microphone and speakers, and needs only the AssemblyAI key. Use headphones, so the agent doesn't hear its own voice, or add `--text` to type instead of talk. Without the LiveKit CLI, `uv run src/agent.py console` does the same.
 
 ### Things to try
 
-- **Be a new patient.** Give your name (Ava asks you to spell your last name), date of birth, phone number, insurance carrier and member ID, medications and allergies, then book a new patient visit. She reads numbers back one character at a time, so you can catch mistakes.
+- **Be a new patient.** Give your name (you'll be asked to spell your last name), date of birth, phone number, insurance carrier and member ID, medications and allergies, then book a new patient visit. Keegan reads numbers back one character at a time, so you can catch mistakes.
 - **Be a returning patient.** Say you're Maria Garcia, born March 14, 1985, and book a follow-up with Dr. Nakamura.
 - **See a cardiologist.** Ask for a cardiology consultation with Dr. Okafor, who sees patients on Tuesday and Thursday afternoons.
-- **Ask for things she shouldn't do.** Ask whether to change a medication dose, or describe chest pain.
+- **Ask for things a receptionist shouldn't do.** Ask whether to change a medication dose, or describe chest pain.
 
 The clinic starts over with every call, and its schedule covers the next two weeks.
 
 ## Run it with LiveKit Cloud
 
-To call Ava from a browser or a phone, connect her to LiveKit. Create a free [LiveKit Cloud](https://cloud.livekit.io) project and add its URL and keys to `.env.local`. If you have the [LiveKit CLI](https://docs.livekit.io/intro/basics/cli/), it can write them for you:
+To call the receptionist from a browser or a phone, connect the agent to LiveKit. Create a free [LiveKit Cloud](https://cloud.livekit.io) project and add its URL and keys to `.env.local`. If you have the [LiveKit CLI](https://docs.livekit.io/intro/basics/cli/), it can write them for you:
 
 ```console
 lk cloud auth
@@ -68,13 +68,13 @@ Then start the agent in development mode, which reloads it when you change the c
 lk agent dev
 ```
 
-The agent registers with LiveKit as `receptionist` (`AGENT_NAME` in `src/agent.py`), and joins a call only when the call asks for it by that name, a setup LiveKit calls [explicit dispatch](https://docs.livekit.io/agents/server/agent-dispatch/). To talk to her:
+The agent registers with LiveKit as `receptionist` (`AGENT_NAME` in `src/agent.py`), and joins a call only when the call asks for it by that name, a setup LiveKit calls [explicit dispatch](https://docs.livekit.io/agents/server/agent-dispatch/). To talk to it:
 
 - **In the browser:** open [the Agent Console](https://cloud.livekit.io/projects/p_/agents/console?autoStart=true&agentName=receptionist) for your LiveKit Cloud project. It shows each turn's transcript, tool calls and timing as you talk ([docs](https://docs.livekit.io/testing/agent-console/)).
 - **From a web app:** set `AGENT_NAME=receptionist` in [agent-starter-react](https://github.com/livekit-examples/agent-starter-react). For other frontends, see [LiveKit's frontend guide](https://docs.livekit.io/frontends/) and [explicit dispatch](https://docs.livekit.io/agents/server/agent-dispatch/).
 - **By phone:** set up [LiveKit telephony](https://docs.livekit.io/telephony/) with a dispatch rule for `receptionist`.
 
-In development mode and on LiveKit Cloud, the agent also gets LiveKit's [adaptive interruption handling](https://docs.livekit.io/agents/logic/turns/adaptive-interruption-handling/), which tells a real interruption from an "uh-huh" in the background. Elsewhere, and in console mode, Ava stops talking whenever the caller does.
+In development mode and on LiveKit Cloud, the agent also gets LiveKit's [adaptive interruption handling](https://docs.livekit.io/agents/logic/turns/adaptive-interruption-handling/), which tells a real interruption from an "uh-huh" in the background. Elsewhere, and in console mode, the agent stops talking whenever the caller speaks.
 
 ## How it works
 
@@ -86,37 +86,37 @@ The agent is in [`src/agent.py`](src/agent.py) and the made-up clinic is in [`sr
 
 **Universal-3.6 Pro decides when the caller is done.** `turn_detection="stt"` uses AssemblyAI's end-of-turn detection, which reads the transcript as well as the silence. If a caller pauses partway through a phone number, the model sees an unfinished number and keeps the turn open. `mode="balanced"` waits up to 1.28 seconds of silence before ending a turn regardless, which gives callers room to read out IDs; `"min_latency"` would cut that to 0.64 seconds. `endpointing={"min_delay": 0}` stops LiveKit from adding its own wait on top.
 
-**The STT knows what Ava just asked.** The plugin passes each of Ava's replies to Universal-3.6 Pro as context, so after "What's your date of birth?" the model expects a date. That's on by default and needs no code.
+**The STT knows what the receptionist just asked.** The plugin passes each of the agent's replies to Universal-3.6 Pro as context, so after "What's your date of birth?" the model expects a date. That's on by default and needs no code.
 
-**Silero and AssemblyAI agree on what speech is.** Silero's voice activity detection decides when the caller is interrupting Ava. Its threshold is set to the STT's own (`0.2`), so the two don't disagree about quiet speech.
+**Silero and AssemblyAI agree on what speech is.** Silero's voice activity detection decides when the caller is interrupting the agent. Its threshold is set to the STT's own (`0.2`), so the two don't disagree about quiet speech.
 
 ### The conversation
 
-**The instructions are the receptionist's playbook.** `INSTRUCTIONS` covers how to talk on the phone, the safety rules, the order of the intake questions and how to book. Ava reads back phone numbers, member IDs and confirmation numbers one character at a time, in groups ("4 1 5, 5 5 5, 0 1 9 9"), so the caller can check them.
+**The instructions are the receptionist's playbook.** `INSTRUCTIONS` covers how to talk on the phone, the safety rules, the order of the intake questions and how to book. The receptionist reads back phone numbers, member IDs and confirmation numbers one character at a time, in groups ("4 1 5, 5 5 5, 0 1 9 9"), so the caller can check them.
 
 **The tools change the clinic's records, not the conversation.** `find_patient`, `register_patient`, `check_availability` and `book_appointment` are methods on `Receptionist` decorated with `@function_tool`. Their docstrings and type hints are what the LLM sees. `visit_type` is a `Literal`, so the model can only pass a visit type the clinic offers. The patient a call is about is kept in the session's `CallState`, not passed around by the LLM, so it can't book an appointment for the wrong person. A `ToolError` tells the model what went wrong, such as an unknown patient or a slot that's gone, so it can recover with the caller.
 
 **The LLM Gateway is used through the OpenAI plugin.** The Gateway speaks the OpenAI Chat Completions API, so `openai.LLM(base_url="https://llm-gateway.assemblyai.com/v1", api_key=ASSEMBLYAI_API_KEY)` is all it takes, with streaming and tool calls for every model family.
 
-**Ava can hang up.** LiveKit's `EndCallTool` lets her end the call after saying goodbye.
+**The receptionist can hang up.** LiveKit's `EndCallTool` lets the agent end the call after saying goodbye.
 
 ### Text-to-speech
 
 **The greeting doesn't wait for the LLM.** `session.say()` speaks a fixed greeting as soon as the caller joins, on a TTS connection that `tts.prewarm()` opened in advance.
 
-**Interruptions are recorded word by word.** With `use_tts_aligned_transcript=True`, AssemblyAI TTS's word timings mean that when the caller cuts Ava off, the chat history keeps only the words they actually heard, so the LLM doesn't think it said things it didn't.
+**Interruptions are recorded word by word.** With `use_tts_aligned_transcript=True`, AssemblyAI TTS's word timings mean that when the caller cuts the agent off, the chat history keeps only the words they actually heard, so the LLM doesn't think it said things it didn't.
 
 ## Make it yours
 
 ### Your own clinic, or another use case
 
-To connect a real practice, reimplement the methods of `Clinic` in [`src/clinic.py`](src/clinic.py) against your practice management or EHR system's API. Ava only calls `find_patient`, `register_patient`, `upcoming_appointments`, `open_slots` and `book`. Change `CLINIC_NAME` and `PROVIDERS` to your own. If your staff names change, the STT's `keyterms_prompt` picks them up automatically.
+To connect a real practice, reimplement the methods of `Clinic` in [`src/clinic.py`](src/clinic.py) against your practice management or EHR system's API. The agent only calls `find_patient`, `register_patient`, `upcoming_appointments`, `open_slots` and `book`. Change `CLINIC_NAME` and `PROVIDERS` to your own. If your staff names change, the STT's `keyterms_prompt` picks them up automatically.
 
 For a different kind of agent, replace `clinic.py`, the tools on `Receptionist`, `INSTRUCTIONS` and `GREETING`, and the STT's `domain`, `prompt` and `keyterms_prompt`. The pipeline in `entrypoint` stays the same. See [LiveKit's tool docs](https://docs.livekit.io/agents/logic/tools/) for more on tools, and [workflows](https://docs.livekit.io/agents/logic/workflows/) for splitting a long conversation into separate agents.
 
 ### LLM
 
-Set `LLM_MODEL` to any model on the [LLM Gateway](https://www.assemblyai.com/docs/llm-gateway/available-models) (`GET https://llm-gateway.assemblyai.com/v1/models` lists them). For a voice agent, time to the first token matters most, because Ava can't start speaking until the LLM does. Here's how a few models compared in one test, streaming a reply with a tool attached, measured from the US East Coast in October 2026:
+Set `LLM_MODEL` to any model on the [LLM Gateway](https://www.assemblyai.com/docs/llm-gateway/available-models) (`GET https://llm-gateway.assemblyai.com/v1/models` lists them). For a voice agent, time to the first token matters most, because the agent can't start speaking until the LLM does. Here's how a few models compared in one test, streaming a reply with a tool attached, measured from the US East Coast in October 2026:
 
 | Model | Median time to first token |
 |---|---|
@@ -131,7 +131,7 @@ Gemma 4 31B passes this repo's tests, including full intake and booking calls. I
 
 ### Voice
 
-Set `TTS_VOICE` to a voice id from the [AssemblyAI voice library](https://www.assemblyai.com/docs/tts/voices) or to a voice you've cloned. To speak another language, pass it to the TTS, for example `assemblyai.TTS(voice=..., language="es")`, and choose a voice for that language.
+Set `TTS_VOICE` to a voice id from the [AssemblyAI voice library](https://www.assemblyai.com/docs/tts/voices) or to a voice you've cloned. The receptionist is named after the voice, Keegan, so set `RECEPTIONIST_NAME` to match; it's used in the greeting, the instructions and the STT's key terms. To speak another language, pass it to the TTS, for example `assemblyai.TTS(voice=..., language="es")`, and choose a voice for that language.
 
 ### Speech recognition
 
@@ -160,7 +160,7 @@ uv run pytest
 ```
 
 - [`tests/test_clinic.py`](tests/test_clinic.py) checks the clinic's records and schedule. It needs no API key.
-- [`tests/test_agent.py`](tests/test_agent.py) tests Ava, as text, through the LLM Gateway. Two tests play out a whole call against a simulated caller (another LLM with a persona), one as a new patient and one as Maria Garcia, then check what ended up in the clinic's records: the intake details exactly as given, and an appointment of the right kind at the right time of day. Others check that she doesn't invent a patient she can't find, sends an emergency to 911 and gives no medical advice, with an LLM judging each reply. They need `ASSEMBLYAI_API_KEY`.
+- [`tests/test_agent.py`](tests/test_agent.py) tests the receptionist, as text, through the LLM Gateway. Two tests play out a whole call against a simulated caller (another LLM with a persona), one as a new patient and one as Maria Garcia, then check what ended up in the clinic's records: the intake details exactly as given, and an appointment of the right kind at the right time of day. Others check that it doesn't invent a patient it can't find, sends an emergency to 911 and gives no medical advice, with an LLM judging each reply. They need `ASSEMBLYAI_API_KEY`.
 
 Run them after you change the instructions, tools or model, and add your own as the agent grows. See [LiveKit's testing docs](https://docs.livekit.io/testing/unit-tests/) for what they can check. GitHub Actions runs them on every push; the agent tests run when the repository has an `ASSEMBLYAI_API_KEY` secret and are skipped otherwise.
 
@@ -179,7 +179,7 @@ That builds the image, uploads it and starts the agent, and writes a `livekit.to
 ## Project layout
 
 ```
-src/agent.py         Ava: instructions, tools and the STT → LLM → TTS pipeline
+src/agent.py         the receptionist: instructions, tools and the STT → LLM → TTS pipeline
 src/clinic.py        the made-up clinic: doctors, open slots and patients
 tests/test_agent.py  simulated calls and LLM-judged replies
 tests/test_clinic.py unit tests of the clinic

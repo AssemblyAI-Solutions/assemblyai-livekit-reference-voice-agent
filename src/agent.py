@@ -1,7 +1,7 @@
 """A medical receptionist voice agent that runs every model on AssemblyAI, with one API key.
 
-Ava answers the phone for a (made-up) clinic: she takes a new patient's intake details or
-looks up a returning patient, finds an open slot and books the appointment.
+Keegan, the receptionist, answers the phone for a (made-up) clinic: takes a new patient's
+intake details or looks up a returning patient, finds an open slot and books the appointment.
 
 - Speech-to-text: Universal-3.6 Pro streaming with Medical Mode, which also decides when the
   caller's turn ends
@@ -61,17 +61,20 @@ LLM_GATEWAY_URL = "https://llm-gateway.assemblyai.com/v1"
 # A voice id from https://www.assemblyai.com/docs/tts/voices, or one of your cloned voices
 TTS_VOICE = "987db62e-a2c2-569a-9c4d-82460cdea1bd"  # Keegan
 
+# The receptionist is named after the voice; if you change one, change the other
+RECEPTIONIST_NAME = "Keegan"
+
 # Silero (used for barge-in) should agree with AssemblyAI's own VAD on what counts as speech,
 # so both use the STT's default threshold on Universal-3.6 Pro.
 VAD_THRESHOLD = 0.2
 
 GREETING = (
-    f"Thanks for calling {CLINIC_NAME}, this is Ava. "
+    f"Thanks for calling {CLINIC_NAME}, this is {RECEPTIONIST_NAME}. "
     "Are you a new patient, or have you been seen here before?"
 )
 
 INSTRUCTIONS = """\
-You are Ava, the receptionist for {clinic}, a primary care and cardiology clinic. You're on a \
+You are {name}, the receptionist for {clinic}, a primary care and cardiology clinic. You're on a \
 phone call, and everything you write is spoken aloud by a text-to-speech voice. Today is \
 {today}.
 
@@ -121,12 +124,13 @@ class Receptionist(Agent):
         today = today or date.today()
         super().__init__(
             instructions=INSTRUCTIONS.format(
+                name=RECEPTIONIST_NAME,
                 clinic=CLINIC_NAME,
                 today=f"{today:%A, %B} {today.day}, {today.year}",
                 primary_care=_providers_for("follow-up"),
                 cardiology=_providers_for("cardiology consultation"),
             ),
-            # Lets Ava hang up once she's said goodbye, but not while she's greeting the caller
+            # Lets the receptionist hang up after saying goodbye, but not during the greeting
             tools=[EndCallTool(ignore_on_enter=True)],
         )
 
@@ -300,7 +304,7 @@ async def entrypoint(ctx: JobContext) -> None:
                 "name, date of birth, phone number, insurance details, medications with doses "
                 "and allergies, and books an appointment."
             ),
-            keyterms_prompt=[CLINIC_NAME, "Ava", *(p.name for p in PROVIDERS)],
+            keyterms_prompt=[CLINIC_NAME, RECEPTIONIST_NAME, *(p.name for p in PROVIDERS)],
             # "balanced" waits up to 1.28 s of silence before ending a turn, so a caller can
             # pause while reading out a phone number or member ID; "min_latency" waits 0.64 s.
             mode="balanced",
@@ -314,7 +318,7 @@ async def entrypoint(ctx: JobContext) -> None:
             turn_detection="stt",
             # ...so LiveKit shouldn't add its own delay on top
             endpointing={"min_delay": 0},
-            # A cough or an "uh-huh" pauses Ava instead of cutting her off
+            # A cough or an "uh-huh" pauses the reply instead of cutting it off
             interruption={"resume_false_interruption": True},
         ),
         tts_text_transforms=["filter_emoji", "filter_markdown"],
