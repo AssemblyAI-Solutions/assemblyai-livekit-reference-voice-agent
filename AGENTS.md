@@ -1,6 +1,6 @@
 # AGENTS.md
 
-A LiveKit Agents (Python) voice agent where every model is from AssemblyAI: Universal-3.6 Pro streaming speech-to-text, an LLM on AssemblyAI's LLM Gateway, and AssemblyAI streaming text-to-speech. The agent is Keegan (`RECEPTIONIST_NAME`), a receptionist for a made-up clinic who takes patient intake and books appointments. See @README.md for setup and the reasoning behind each setting.
+A LiveKit Agents (Python) voice agent where every model is from AssemblyAI: Universal-3.6 Pro streaming speech-to-text, an LLM on AssemblyAI's LLM Gateway, and AssemblyAI streaming text-to-speech. The agent is Keegan (`RECEPTIONIST_NAME`), a receptionist for a made-up clinic who takes patient intake and books appointments. See @README.md for setup, and `src/README.md` for the reasoning behind each setting.
 
 ## Layout
 
@@ -8,6 +8,18 @@ A LiveKit Agents (Python) voice agent where every model is from AssemblyAI: Univ
 - `src/clinic.py`: the in-memory clinic the tools run against. It stands in for a practice management or EHR system; keep it free of LiveKit imports.
 - `tests/test_clinic.py`: offline unit tests of the clinic.
 - `tests/test_agent.py`: text-only tests of the receptionist through the LLM Gateway. Full calls are played against a simulated caller and checked against the clinic's records; single replies are judged by an LLM.
+- `skills/`: step-by-step instructions for common changes, one `SKILL.md` per folder. `.claude/skills` links to it, so Claude Code loads them automatically.
+- Each folder has a `README.md` for people. Keep them in step with the code.
+
+## Skills
+
+Before making one of these changes, read the skill's `SKILL.md` and follow it:
+
+- `skills/change-the-voice`: a different TTS voice, accent or language, or a cloned voice
+- `skills/wait-longer-for-numbers`: callers cut off while reading out numbers or IDs (turn detection)
+- `skills/sync-second-pass`: more accurate numbers and IDs, re-transcribed with the Sync API from the STT node
+- `skills/switch-llm`: another LLM Gateway model
+- `skills/make-it-yours`: a different agent or use case, or real systems behind the tools
 
 ## Tooling
 
@@ -26,11 +38,12 @@ A LiveKit Agents (Python) voice agent where every model is from AssemblyAI: Univ
 
 ## AssemblyAI specifics
 
-- The LLM Gateway is OpenAI-compatible: `openai.LLM(base_url="https://llm-gateway.assemblyai.com/v1", api_key=ASSEMBLYAI_API_KEY)`. Model IDs have no provider prefix (`gemma-4-31b`, `claude-haiku-4-5-20251001`); `GET /v1/models` lists them. The EU Gateway (`llm-gateway.eu.assemblyai.com`) serves only Anthropic and Google Gemini models.
+- The LLM Gateway is OpenAI-compatible: `openai.LLM(base_url="https://llm-gateway.assemblyai.com/v1", api_key=ASSEMBLYAI_API_KEY)`. Model IDs have no provider prefix (`gemma-4-31b`, `claude-haiku-4-5-20251001`); `GET /v1/models` lists them. The EU Gateway (`llm-gateway.eu.assemblyai.com`) serves a subset, and not `gemma-4-31b`; its own `GET /v1/models` lists them.
 - Turn detection is Universal-3.6 Pro's own (`turn_detection="stt"`), so LiveKit's `endpointing.min_delay` stays `0`. Tune turn-taking with the STT's `mode`, `min_turn_silence` and `max_turn_silence`, not LiveKit's endpointing.
 - Silero's `activation_threshold` matches the STT's `vad_threshold` (`0.2`, the Universal-3.6 Pro default). Change them together.
 - Medical Mode (`domain="medical-v1"`) supports English, Spanish, German and French, and is billed as an add-on.
-- AssemblyAI docs: https://www.assemblyai.com/docs. Universal-3.6 Pro with LiveKit: https://www.assemblyai.com/docs/voice-agents/livekit-universal-3-6-pro
+- AssemblyAI TTS `language` takes a name (`spanish`) on the raw API; the LiveKit plugin also accepts codes (`es`). Library voices other than the eleven featured `aai-*` voices, and cloned voices, speak only their own language.
+- AssemblyAI docs: https://www.assemblyai.com/docs (an index for agents: https://www.assemblyai.com/docs/llms.txt). Universal-3.6 Pro with LiveKit: https://www.assemblyai.com/docs/voice-agents/livekit-universal-3-6-pro
 
 ## LiveKit documentation
 

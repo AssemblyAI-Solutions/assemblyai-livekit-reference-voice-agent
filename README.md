@@ -1,18 +1,22 @@
-# AssemblyAI reference voice agent for LiveKit
+# AssemblyAI voice agent starter for LiveKit
 
-A starter voice agent built with [LiveKit Agents](https://github.com/livekit/agents), where every model is from AssemblyAI and runs on one API key. Keegan, the receptionist, answers the phone for a made-up clinic, Riverside Family Medicine: taking a new patient's intake details or looking up a returning patient, finding an open time and booking the appointment.
+Build a voice agent on [LiveKit Agents](https://github.com/livekit/agents) where the voice, the ears and the brain are all AssemblyAI, on one API key.
 
-| | AssemblyAI service | What it does for the receptionist |
+You start with Keegan, a receptionist who answers the phone for a made-up clinic. Keegan takes a new patient's details or looks up a returning one, finds an open time and books the appointment. Talk to Keegan in five minutes, then make the agent your own.
+
+| | AssemblyAI model | What it does |
 |---|---|---|
-| **Ears** | [Universal-3.6 Pro streaming speech-to-text](https://www.assemblyai.com/docs/voice-agents/livekit-universal-3-6-pro), with [Medical Mode](https://www.assemblyai.com/docs/streaming/medical-mode) | Transcribes the caller, including drug names, doses and member IDs, and decides when they've finished their turn |
-| **Brain** | [LLM Gateway](https://www.assemblyai.com/docs/llm-gateway/quickstart) | Runs the conversation and calls the clinic's tools, with your choice of model from Google, OpenAI, Anthropic and others |
-| **Voice** | [Streaming text-to-speech](https://www.assemblyai.com/docs/tts/getting-started/quickstart) | Speaks the replies, with word timings so interruptions are recorded accurately |
+| **Voice** | [Streaming text-to-speech](https://www.assemblyai.com/docs/tts/getting-started/quickstart) | Speaks every reply as it's written, in any of 4,000+ voices across six languages, or a voice you clone. Word timings mean an interrupted reply is remembered only up to the words the caller heard. |
+| **Ears** | [Universal-3.6 Pro streaming speech-to-text](https://www.assemblyai.com/docs/voice-agents/livekit-universal-3-6-pro) | Transcribes the caller, with [Medical Mode](https://www.assemblyai.com/docs/streaming/medical-mode) for drug names and doses, and decides when they've finished talking. |
+| **Brain** | [LLM Gateway](https://www.assemblyai.com/docs/llm-gateway/quickstart) | Runs the conversation and calls the clinic's tools, on your choice of 50 models from Google, OpenAI, Anthropic and others. |
 
-It's a small, complete starting point: one agent, four tools, a made-up clinic to run them against, tests, and a Dockerfile for deploying to [LiveKit Cloud](https://cloud.livekit.io). Fork it and make it yours.
+Using Pipecat? The same agent is in [assemblyai-pipecat-reference-voice-agent](https://github.com/AssemblyAI-Solutions/assemblyai-pipecat-reference-voice-agent).
 
-## Quickstart
+## Get started
 
-You need [uv](https://docs.astral.sh/uv/getting-started/installation/), [Git LFS](https://git-lfs.com) (for the voice activity model while the plugin is installed from GitHub), the [LiveKit CLI](https://docs.livekit.io/intro/basics/cli/) (`brew install livekit-cli` on macOS), and an [AssemblyAI API key](https://www.assemblyai.com/dashboard/api-keys).
+### 1. Install
+
+You need [uv](https://docs.astral.sh/uv/getting-started/installation/), [Git LFS](https://git-lfs.com), the [LiveKit CLI](https://docs.livekit.io/intro/basics/cli/) (`brew install livekit-cli` on macOS) and an [AssemblyAI API key](https://www.assemblyai.com/dashboard/api-keys).
 
 ```console
 git clone https://github.com/AssemblyAI-Solutions/assemblyai-livekit-reference-voice-agent.git
@@ -21,87 +25,93 @@ uv sync
 cp .env.example .env.local
 ```
 
-Put your AssemblyAI API key in `.env.local`, then call the receptionist from your terminal:
+Put your API key in `.env.local`. It's the only key you need to talk to the agent.
+
+### 2. Talk to Keegan
 
 ```console
 lk agent console
 ```
 
-Console mode uses your computer's microphone and speakers, and needs only the AssemblyAI key. Use headphones, so the agent doesn't hear its own voice, or add `--text` to type instead of talk. Without the LiveKit CLI, `uv run src/agent.py console` does the same.
+This uses your computer's microphone and speakers. Wear headphones so the agent doesn't hear itself, or add `--text` to type instead. Without the LiveKit CLI, `uv run src/agent.py console` does the same.
 
-### Things to try
+Things to try:
 
-- **Be a new patient.** Give your name (you'll be asked to spell your last name), date of birth, phone number, insurance carrier and member ID, medications and allergies, then book a new patient visit. Keegan reads numbers back one character at a time, so you can catch mistakes.
+- **Be a new patient.** Give your name, date of birth, phone number, insurance and medications, then book a visit. Keegan reads numbers back one character at a time so you can catch mistakes.
 - **Be a returning patient.** Say you're Maria Garcia, born March 14, 1985, and book a follow-up with Dr. Nakamura.
-- **See a cardiologist.** Ask for a cardiology consultation with Dr. Okafor, who sees patients on Tuesday and Thursday afternoons.
-- **Ask for things a receptionist shouldn't do.** Ask whether to change a medication dose, or describe chest pain.
+- **Cut Keegan off mid-sentence.** Keegan stops, and remembers only what you heard.
+- **Ask for something a receptionist shouldn't do**, such as whether to double a medication, or describe chest pain.
 
-The clinic starts over with every call, and its schedule covers the next two weeks.
+### 3. Change the voice
 
-## Run it with LiveKit Cloud
+The voice is one line in [`src/agent.py`](src/agent.py):
 
-To call the receptionist from a browser or a phone, connect the agent to LiveKit. Create a free [LiveKit Cloud](https://cloud.livekit.io) project and add its URL and keys to `.env.local`. If you have the [LiveKit CLI](https://docs.livekit.io/intro/basics/cli/), it can write them for you:
+```python
+TTS_VOICE = "987db62e-a2c2-569a-9c4d-82460cdea1bd"  # Keegan
+```
+
+Hear any voice before you pick it (`afplay` is macOS; elsewhere, open `voice.wav`):
+
+```console
+export ASSEMBLYAI_API_KEY=<your key>
+curl -sS https://tts.us.assemblyai.com/v1/speech \
+  -H "Authorization: $ASSEMBLYAI_API_KEY" -H "Content-Type: application/json" \
+  -d '{"text": "Thanks for calling Riverside Family Medicine.", "voice_id": "aai-jane", "container": "wav"}' \
+  -o voice.wav && afplay voice.wav
+```
+
+Browse the library, for example its Spanish voices:
+
+```console
+curl -s "https://tts.us.assemblyai.com/v1/voices?scope=public&language=spanish&limit=20" \
+  -H "Authorization: $ASSEMBLYAI_API_KEY" | jq -r '.voices[] | "\(.id)  \(.name)  \(.description)"'
+```
+
+Set `TTS_VOICE` to the voice's id, and `RECEPTIONIST_NAME` to match, since the agent introduces itself by name. To use your own voice, [clone it in the dashboard](https://www.assemblyai.com/docs/tts/cloned-voices) and use its id. The [change-the-voice skill](skills/change-the-voice/SKILL.md) covers languages, featured voices and data residency.
+
+### 4. Call it from a browser or a phone
+
+Create a free [LiveKit Cloud](https://cloud.livekit.io) project and add its keys to `.env.local`:
 
 ```console
 lk cloud auth
 lk app env --write --destination .env.local
-```
-
-Then start the agent in development mode, which reloads it when you change the code:
-
-```console
 lk agent dev
 ```
 
-The agent registers with LiveKit as `receptionist` (`AGENT_NAME` in `src/agent.py`), and joins a call only when the call asks for it by that name, a setup LiveKit calls [explicit dispatch](https://docs.livekit.io/agents/server/agent-dispatch/). To talk to it:
+Then open the [Agent Console](https://cloud.livekit.io/projects/p_/agents/console?autoStart=true&agentName=receptionist) to talk to the agent in your browser, with each turn's transcript, tool calls and timings. The agent registers as `receptionist`, so a [web app](https://github.com/livekit-examples/agent-starter-react) or a [phone number](https://docs.livekit.io/telephony/) reaches it by that name ([explicit dispatch](https://docs.livekit.io/agents/server/agent-dispatch/)).
 
-- **In the browser:** open [the Agent Console](https://cloud.livekit.io/projects/p_/agents/console?autoStart=true&agentName=receptionist) for your LiveKit Cloud project. It shows each turn's transcript, tool calls and timing as you talk ([docs](https://docs.livekit.io/testing/agent-console/)).
-- **From a web app:** set `AGENT_NAME=receptionist` in [agent-starter-react](https://github.com/livekit-examples/agent-starter-react). For other frontends, see [LiveKit's frontend guide](https://docs.livekit.io/frontends/) and [explicit dispatch](https://docs.livekit.io/agents/server/agent-dispatch/).
-- **By phone:** set up [LiveKit telephony](https://docs.livekit.io/telephony/) with a dispatch rule for `receptionist`.
+## Build it out with skills
 
-In development mode and on LiveKit Cloud, the agent also gets LiveKit's [adaptive interruption handling](https://docs.livekit.io/agents/logic/turns/adaptive-interruption-handling/), which tells a real interruption from an "uh-huh" in the background. Elsewhere, and in console mode, the agent stops talking whenever the caller speaks.
+The [`skills/`](skills/) folder holds instructions for coding agents, such as Claude Code, Cursor or Codex. Each one teaches your coding agent a change worth making, with code that's been tested against the AssemblyAI API. Open the repo in Claude Code and ask for what you want, for example "give Keegan a British voice" or "make phone numbers more accurate". The matching skill loads automatically.
+
+| Skill | What it does |
+|---|---|
+| [change-the-voice](skills/change-the-voice/SKILL.md) | Pick a voice from the library, clone your own, or speak Spanish, German, French, Italian or Portuguese |
+| [wait-longer-for-numbers](skills/wait-longer-for-numbers/SKILL.md) | Give callers time to read out phone numbers and IDs, so a pause doesn't end their turn |
+| [sync-second-pass](skills/sync-second-pass/SKILL.md) | Re-transcribe answers with numbers and IDs with the Sync API, uploaded live as the caller speaks |
+| [switch-llm](skills/switch-llm/SKILL.md) | Choose one of the LLM Gateway's 50 models for tool calling |
+| [make-it-yours](skills/make-it-yours/SKILL.md) | Turn the receptionist into your own agent, or connect it to your real systems |
 
 ## How it works
 
-The agent is in [`src/agent.py`](src/agent.py) and the made-up clinic is in [`src/clinic.py`](src/clinic.py). Both are short enough to read top to bottom. These are the choices they make, and why.
+```
+caller ──▶ Universal-3.6 Pro STT ──▶ LLM Gateway ──▶ AssemblyAI TTS ──▶ caller
+           Medical Mode,              tools change     word-timed audio
+           decides when the           the clinic's
+           caller is done             records
+```
 
-### Speech-to-text
+- [`src/agent.py`](src/agent.py) is the whole agent: the instructions, the greeting, four tools and the pipeline.
+- [`src/clinic.py`](src/clinic.py) is the made-up clinic the tools work on: doctors, open times and patients.
 
-**Medical Mode, a description of the call, and the names it will hear.** `domain="medical-v1"` turns on [Medical Mode](https://www.assemblyai.com/docs/streaming/medical-mode), which improves accuracy on medications, conditions and dosages. It's a paid add-on; remove it to compare. `prompt` describes what a call to the clinic is about, and `keyterms_prompt` lists the clinic's and doctors' names so they're always spelled right.
+[`src/README.md`](src/README.md) walks through every setting and why it's there.
 
-**Universal-3.6 Pro decides when the caller is done.** `turn_detection="stt"` uses AssemblyAI's end-of-turn detection, which reads the transcript as well as the silence. If a caller pauses partway through a phone number, the model sees an unfinished number and keeps the turn open. `mode="balanced"` waits up to 1.28 seconds of silence before ending a turn regardless, which gives callers room to read out IDs; `"min_latency"` would cut that to 0.64 seconds. `endpointing={"min_delay": 0}` stops LiveKit from adding its own wait on top.
+## Models
 
-**The STT knows what the receptionist just asked.** The plugin passes each of the agent's replies to Universal-3.6 Pro as context, so after "What's your date of birth?" the model expects a date. That's on by default and needs no code.
+**Voice.** Any of the 4,000+ voices in the [AssemblyAI voice library](https://www.assemblyai.com/docs/tts/voices), in English, Spanish, German, French, Italian and Portuguese, or a [voice you clone](https://www.assemblyai.com/docs/tts/cloned-voices).
 
-**Silero and AssemblyAI agree on what speech is.** Silero's voice activity detection decides when the caller is interrupting the agent. Its threshold is set to the STT's own (`0.2`), so the two don't disagree about quiet speech.
-
-### The conversation
-
-**The instructions are the receptionist's playbook.** `INSTRUCTIONS` covers how to talk on the phone, the safety rules, the order of the intake questions and how to book. The receptionist reads back phone numbers, member IDs and confirmation numbers one character at a time, in groups ("4 1 5, 5 5 5, 0 1 9 9"), so the caller can check them.
-
-**The tools change the clinic's records, not the conversation.** `find_patient`, `register_patient`, `check_availability` and `book_appointment` are methods on `Receptionist` decorated with `@function_tool`. Their docstrings and type hints are what the LLM sees. `visit_type` is a `Literal`, so the model can only pass a visit type the clinic offers. The patient a call is about is kept in the session's `CallState`, not passed around by the LLM, so it can't book an appointment for the wrong person. A `ToolError` tells the model what went wrong, such as an unknown patient or a slot that's gone, so it can recover with the caller.
-
-**The LLM Gateway is used through the OpenAI plugin.** The Gateway speaks the OpenAI Chat Completions API, so `openai.LLM(base_url="https://llm-gateway.assemblyai.com/v1", api_key=ASSEMBLYAI_API_KEY)` is all it takes, with streaming and tool calls for every model family.
-
-**The receptionist can hang up.** LiveKit's `EndCallTool` lets the agent end the call after saying goodbye.
-
-### Text-to-speech
-
-**The greeting doesn't wait for the LLM.** `session.say()` speaks a fixed greeting as soon as the caller joins, on a TTS connection that `tts.prewarm()` opened in advance.
-
-**Interruptions are recorded word by word.** With `use_tts_aligned_transcript=True`, AssemblyAI TTS's word timings mean that when the caller cuts the agent off, the chat history keeps only the words they actually heard, so the LLM doesn't think it said things it didn't.
-
-## Make it yours
-
-### Your own clinic, or another use case
-
-To connect a real practice, reimplement the methods of `Clinic` in [`src/clinic.py`](src/clinic.py) against your practice management or EHR system's API. The agent only calls `find_patient`, `register_patient`, `upcoming_appointments`, `open_slots` and `book`. Change `CLINIC_NAME` and `PROVIDERS` to your own. If your staff names change, the STT's `keyterms_prompt` picks them up automatically.
-
-For a different kind of agent, replace `clinic.py`, the tools on `Receptionist`, `INSTRUCTIONS` and `GREETING`, and the STT's `domain`, `prompt` and `keyterms_prompt`. The pipeline in `entrypoint` stays the same. See [LiveKit's tool docs](https://docs.livekit.io/agents/logic/tools/) for more on tools, and [workflows](https://docs.livekit.io/agents/logic/workflows/) for splitting a long conversation into separate agents.
-
-### LLM
-
-Set `LLM_MODEL` to any model on the [LLM Gateway](https://www.assemblyai.com/docs/llm-gateway/available-models) (`GET https://llm-gateway.assemblyai.com/v1/models` lists them). For a voice agent, time to the first token matters most, because the agent can't start speaking until the LLM does. Here's how a few models compared in one test, streaming a reply with a tool attached, measured from the US East Coast in October 2026:
+**LLM.** Set `LLM_MODEL` in `src/agent.py` to any LLM Gateway model that supports tool calling. Time to the first token matters most in a voice agent, because the agent can't speak until the LLM does. These were fastest in one test, streaming a reply with a tool attached, from the US East Coast in October 2026:
 
 | Model | Median time to first token |
 |---|---|
@@ -109,22 +119,14 @@ Set `LLM_MODEL` to any model on the [LLM Gateway](https://www.assemblyai.com/doc
 | `gemini-3.5-flash-lite` | ~0.7 s |
 | `claude-haiku-4-5-20251001` | ~0.8 s |
 | `gpt-4.1` | ~0.8 s |
-| `claude-haiku-5-5` | ~1.0 s |
-| `gemini-3.6-flash` | ~2.2 s |
 
-Gemma 4 31B passes this repo's tests, including full intake and booking calls. If you switch models, run the tests again: larger models handle unusual calls better but answer more slowly, and reasoning models can take several seconds before their first word.
+The [switch-llm skill](skills/switch-llm/SKILL.md) lists every suitable model. After switching, run the tests: larger models handle unusual calls better but answer more slowly.
 
-### Voice
+**Speech-to-text.** Universal-3.6 Pro, with Medical Mode for English, Spanish, German and French. It recognizes many languages and switches between them on its own.
 
-Set `TTS_VOICE` to a voice id from the [AssemblyAI voice library](https://www.assemblyai.com/docs/tts/voices) or to a voice you've cloned. The receptionist is named after the voice, Keegan, so set `RECEPTIONIST_NAME` to match; it's used in the greeting, the instructions and the STT's key terms. To speak another language, pass it to the TTS, for example `assemblyai.TTS(voice=..., language="es")`, and choose a voice for that language.
+## Keep data in the EU
 
-### Speech recognition
-
-Universal-3.6 Pro recognizes many languages and switches between them on its own. To expect particular ones, pass `language_codes=["es"]` or `language_codes=["en", "es"]` to `assemblyai.STT(...)`; Medical Mode supports English, Spanish, German and French. If callers' turns are cut off while they read out long numbers, raise `max_turn_silence`. See [the Universal-3.6 Pro guide for LiveKit](https://www.assemblyai.com/docs/voice-agents/livekit-universal-3-6-pro) for every setting, including noise suppression with `voice_focus`.
-
-### Keeping data in the EU
-
-Point all three services at AssemblyAI's EU hosts:
+Point all three services at AssemblyAI's EU hosts in `src/agent.py`:
 
 ```python
 assemblyai.STT(..., base_url="wss://streaming.eu.assemblyai.com")
@@ -132,54 +134,40 @@ assemblyai.TTS(..., base_url="wss://tts.eu.assemblyai.com")
 LLM_GATEWAY_URL = "https://llm-gateway.eu.assemblyai.com/v1"
 ```
 
-The EU LLM Gateway serves Anthropic and Google Gemini models but not `gemma-4-31b`, so also switch `LLM_MODEL`, for example to `gemini-3.5-flash-lite`. Cloned voices are only available in the region where you created them.
+The EU Gateway doesn't serve `gemma-4-31b`, so also set `LLM_MODEL` to an EU model such as `gemini-3.5-flash-lite`. A cloned voice works only in the region where you created it.
 
-## Using coding agents
-
-The repository includes an [`AGENTS.md`](AGENTS.md) (and a `CLAUDE.md` that points to it) for coding agents like Claude Code, Cursor and Codex. It covers the layout, how to test a change, and the AssemblyAI and LiveKit settings that are easy to get wrong. For LiveKit's own documentation, they can use `lk docs search` and `lk docs get-page`, or LiveKit's [docs MCP server](https://docs.livekit.io/reference/developer-tools/docs-mcp/).
-
-## Tests
+## Test
 
 ```console
 uv run pytest
 ```
 
-- [`tests/test_clinic.py`](tests/test_clinic.py) checks the clinic's records and schedule. It needs no API key.
-- [`tests/test_agent.py`](tests/test_agent.py) tests the receptionist, as text, through the LLM Gateway. Two tests play out a whole call against a simulated caller (another LLM with a persona), one as a new patient and one as Maria Garcia, then check what ended up in the clinic's records: the intake details exactly as given, and an appointment of the right kind at the right time of day. Others check that it doesn't invent a patient it can't find, sends an emergency to 911 and gives no medical advice, with an LLM judging each reply. They need `ASSEMBLYAI_API_KEY`.
-
-Run them after you change the instructions, tools or model, and add your own as the agent grows. See [LiveKit's testing docs](https://docs.livekit.io/testing/unit-tests/) for what they can check. GitHub Actions runs them on every push; the agent tests run when the repository has an `ASSEMBLYAI_API_KEY` secret and are skipped otherwise.
+The tests play whole calls against a simulated caller and check what ended up in the clinic's records. Run them after you change the instructions, a tool or the model. See [`tests/README.md`](tests/README.md).
 
 ## Deploy
-
-The [`Dockerfile`](Dockerfile) builds a production image that runs `src/agent.py start`. It installs from `uv.lock`, so run `uv sync` once to create the lockfile, and commit it.
-
-To deploy to LiveKit Cloud with the [LiveKit CLI](https://docs.livekit.io/intro/basics/cli/):
 
 ```console
 lk agent create --secrets ASSEMBLYAI_API_KEY=<your key>
 ```
 
-That builds the image, uploads it and starts the agent, and writes a `livekit.toml` for later deploys with `lk agent deploy`. See [Deploying to LiveKit Cloud](https://docs.livekit.io/deploy/agents/) for logs, scaling and secrets. The image also runs anywhere else that can run a container, given the `LIVEKIT_*` and `ASSEMBLYAI_API_KEY` environment variables.
+That builds the [`Dockerfile`](Dockerfile), deploys it to LiveKit Cloud and writes a `livekit.toml` for later `lk agent deploy`s. Commit `uv.lock` first, since the image installs from it. See [Deploying to LiveKit Cloud](https://docs.livekit.io/deploy/agents/). The image runs on any container host, given `ASSEMBLYAI_API_KEY` and the `LIVEKIT_*` variables.
 
 ## Project layout
 
 ```
-src/agent.py         the receptionist: instructions, tools and the STT → LLM → TTS pipeline
-src/clinic.py        the made-up clinic: doctors, open slots and patients
-tests/test_agent.py  simulated calls and LLM-judged replies
-tests/test_clinic.py unit tests of the clinic
-.env.example         the environment variables, copied to .env.local
-Dockerfile           production image for LiveKit Cloud or any container host
-AGENTS.md            guidance for coding agents working on the project
+src/        the agent and the made-up clinic
+tests/      simulated calls and unit tests
+skills/     instructions for coding agents, to build the agent out
+AGENTS.md   guidance for coding agents working on this repo (CLAUDE.md points to it)
 ```
 
 ## Resources
 
-- [Universal-3.6 Pro with LiveKit](https://www.assemblyai.com/docs/voice-agents/livekit-universal-3-6-pro): turn detection, latency and accuracy tuning
-- [Medical Mode](https://www.assemblyai.com/docs/streaming/medical-mode): languages, pricing and settings for medical conversations
-- [LLM Gateway](https://www.assemblyai.com/docs/llm-gateway/quickstart): models, tool calling and prompt caching
-- [AssemblyAI text-to-speech](https://www.assemblyai.com/docs/tts/getting-started/quickstart): voices, languages and voice cloning
-- [LiveKit Agents docs](https://docs.livekit.io/agents/): sessions, tools, workflows and telephony
+- [AssemblyAI text-to-speech](https://www.assemblyai.com/docs/tts/getting-started/quickstart): voices, languages and cloning
+- [Universal-3.6 Pro with LiveKit](https://www.assemblyai.com/docs/voice-agents/livekit-universal-3-6-pro): turn detection and accuracy settings
+- [LLM Gateway](https://www.assemblyai.com/docs/llm-gateway/quickstart): models and tool calling
+- [Sync speech-to-text](https://www.assemblyai.com/docs/sync-stt/getting-started/quickstart): a transcript in one HTTP request
+- [LiveKit Agents](https://docs.livekit.io/agents/): sessions, tools, workflows and telephony
 
 ## License
 
