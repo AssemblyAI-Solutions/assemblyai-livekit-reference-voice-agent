@@ -1,0 +1,46 @@
+[project]
+name = "assemblyai-livekit-voice-agent"
+version = "0.1.0"
+description = "A starter voice agent for LiveKit with AssemblyAI speech-to-text, LLM Gateway and text-to-speech"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10, <3.15"
+dependencies = [
+    "livekit-agents~=1.8",
+    "livekit-plugins-assemblyai~=1.8",
+    "livekit-plugins-openai~=1.8",
+    "livekit-plugins-silero~=1.8",
+    "python-dotenv",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "ruff",
+]
+
+# AssemblyAI TTS in livekit-plugins-assemblyai isn't on PyPI yet. Until it is, the framework
+# and the plugins all come from the same commit of the branch that adds it, so they always
+# match. `lfs`: Silero's model file is stored in Git LFS. Once the plugin is released,
+# delete this table and run `uv lock`.
+[tool.uv.sources]
+livekit-agents = { git = "https://github.com/dlange-aai/agents", rev = "4afca15bd", lfs = true, subdirectory = "livekit-agents" }
+livekit-plugins-assemblyai = { git = "https://github.com/dlange-aai/agents", rev = "4afca15bd", lfs = true, subdirectory = "livekit-plugins/livekit-plugins-assemblyai" }
+livekit-plugins-openai = { git = "https://github.com/dlange-aai/agents", rev = "4afca15bd", lfs = true, subdirectory = "livekit-plugins/livekit-plugins-openai" }
+livekit-plugins-silero = { git = "https://github.com/dlange-aai/agents", rev = "4afca15bd", lfs = true, subdirectory = "livekit-plugins/livekit-plugins-silero" }
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "B", "UP", "SIM", "RUF"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["agent", "weather"]
