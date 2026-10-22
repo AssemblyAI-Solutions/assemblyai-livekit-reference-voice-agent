@@ -1,7 +1,7 @@
 [project]
 name = "assemblyai-livekit-voice-agent"
 version = "0.1.0"
-description = "A starter voice agent for LiveKit with AssemblyAI speech-to-text, LLM Gateway and text-to-speech"
+description = "A medical receptionist voice agent for LiveKit with AssemblyAI speech-to-text, LLM Gateway and text-to-speech"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10, <3.15"
@@ -43,4 +43,4 @@ target-version = "py310"
 select = ["E", "F", "W", "I", "N", "B", "UP", "SIM", "RUF"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["agent", "weather"]
+known-first-party = ["agent", "clinic"]
