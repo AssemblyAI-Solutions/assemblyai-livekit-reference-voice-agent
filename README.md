@@ -27,7 +27,7 @@ It's a small, complete starting point: one agent, four tools, a made-up clinic t
 
 ## Quickstart
 
-You need [uv](https://docs.astral.sh/uv/getting-started/installation/), [Git LFS](https://git-lfs.com) (for the voice activity model while the plugin is installed from GitHub), and an [AssemblyAI API key](https://www.assemblyai.com/dashboard/api-keys).
+You need [uv](https://docs.astral.sh/uv/getting-started/installation/), [Git LFS](https://git-lfs.com) (for the voice activity model while the plugin is installed from GitHub), the [LiveKit CLI](https://docs.livekit.io/intro/basics/cli/) (`brew install livekit-cli` on macOS), and an [AssemblyAI API key](https://www.assemblyai.com/dashboard/api-keys).
 
 ```console
 git clone https://github.com/AssemblyAI-Solutions/assemblyai-livekit-reference-voice-agent.git
@@ -39,10 +39,10 @@ cp .env.example .env.local
 Put your AssemblyAI API key in `.env.local`, then call Ava from your terminal:
 
 ```console
-uv run src/agent.py console
+lk agent console
 ```
 
-Console mode uses your computer's microphone and speakers, and needs only the AssemblyAI key. Add `--text` to type instead of talk. Use headphones, so Ava doesn't hear herself. (With [LiveKit CLI](https://docs.livekit.io/intro/basics/cli/) 2.18.8 or later, `lk agent console` does the same.)
+Console mode uses your computer's microphone and speakers, and needs only the AssemblyAI key. Use headphones, so Ava doesn't hear herself, or add `--text` to type instead of talk. Without the LiveKit CLI, `uv run src/agent.py console` does the same.
 
 ### Things to try
 
@@ -62,15 +62,19 @@ lk cloud auth
 lk app env --write --destination .env.local
 ```
 
-Then start the agent in development mode:
+Then start the agent in development mode, which reloads it when you change the code:
 
 ```console
-uv run src/agent.py dev
+lk agent dev
 ```
 
-Open your project's [Agent Console](https://docs.livekit.io/testing/agent-console/) in LiveKit Cloud to talk to her, or connect a frontend such as [agent-starter-react](https://github.com/livekit-examples/agent-starter-react) (web), [agent-starter-swift](https://github.com/livekit-examples/agent-starter-swift) (iOS and macOS) or [agent-starter-android](https://github.com/livekit-examples/agent-starter-android). To give her a phone number, see [LiveKit telephony](https://docs.livekit.io/telephony/).
+The agent registers with LiveKit as `receptionist` (`AGENT_NAME` in `src/agent.py`), and joins a call only when the call asks for it by that name, a setup LiveKit calls [explicit dispatch](https://docs.livekit.io/agents/server/agent-dispatch/). To talk to her:
 
-With LiveKit credentials set, the agent also gets LiveKit Cloud's [adaptive interruption handling](https://docs.livekit.io/agents/logic/turns/adaptive-interruption-handling/), which tells a real interruption from an "uh-huh" in the background. Without them, it logs a warning and falls back to interrupting on voice activity.
+- **In the browser:** open [the Agent Console](https://cloud.livekit.io/projects/p_/agents/console?autoStart=true&agentName=receptionist) for your LiveKit Cloud project. It shows each turn's transcript, tool calls and timing as you talk ([docs](https://docs.livekit.io/testing/agent-console/)).
+- **From a web app:** set `AGENT_NAME=receptionist` in [agent-starter-react](https://github.com/livekit-examples/agent-starter-react). For other frontends, see [LiveKit's frontend guide](https://docs.livekit.io/frontends/) and [explicit dispatch](https://docs.livekit.io/agents/server/agent-dispatch/).
+- **By phone:** set up [LiveKit telephony](https://docs.livekit.io/telephony/) with a dispatch rule for `receptionist`.
+
+In development mode and on LiveKit Cloud, the agent also gets LiveKit's [adaptive interruption handling](https://docs.livekit.io/agents/logic/turns/adaptive-interruption-handling/), which tells a real interruption from an "uh-huh" in the background. Elsewhere, and in console mode, Ava stops talking whenever the caller does.
 
 ## How it works
 
@@ -145,6 +149,10 @@ LLM_GATEWAY_URL = "https://llm-gateway.eu.assemblyai.com/v1"
 
 The EU LLM Gateway serves Anthropic and Google Gemini models but not `gemma-4-31b`, so also switch `LLM_MODEL`, for example to `gemini-3.5-flash-lite`. Cloned voices are only available in the region where you created them.
 
+## Using coding agents
+
+The repository includes an [`AGENTS.md`](AGENTS.md) (and a `CLAUDE.md` that points to it) for coding agents like Claude Code, Cursor and Codex. It covers the layout, how to test a change, and the AssemblyAI and LiveKit settings that are easy to get wrong. For LiveKit's own documentation, they can use `lk docs search` and `lk docs get-page`, or LiveKit's [docs MCP server](https://docs.livekit.io/reference/developer-tools/docs-mcp/).
+
 ## Tests
 
 ```console
@@ -177,6 +185,7 @@ tests/test_agent.py  simulated calls and LLM-judged replies
 tests/test_clinic.py unit tests of the clinic
 .env.example         the environment variables, copied to .env.local
 Dockerfile           production image for LiveKit Cloud or any container host
+AGENTS.md            guidance for coding agents working on the project
 ```
 
 ## Resources

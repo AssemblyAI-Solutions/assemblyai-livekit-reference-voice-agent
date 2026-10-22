@@ -50,6 +50,9 @@ load_dotenv(Path(__file__).parents[1] / ".env.local")
 
 logger = logging.getLogger("agent")
 
+# Frontends, phone numbers and the Agent Console ask LiveKit for the agent by this name
+AGENT_NAME = "receptionist"
+
 # Any model from https://llm-gateway.assemblyai.com/v1/models; see the README for how a few
 # compare on time to first token.
 LLM_MODEL = "gemma-4-31b"
@@ -277,7 +280,7 @@ def prewarm(proc: JobProcess) -> None:
 server.setup_fnc = prewarm
 
 
-@server.rtc_session()
+@server.rtc_session(agent_name=AGENT_NAME)
 async def entrypoint(ctx: JobContext) -> None:
     ctx.log_context_fields = {"room": ctx.room.name}
 
