@@ -8,7 +8,7 @@ A voice agent template for [LiveKit Agents](https://github.com/livekit/agents) w
 | **Ears** | [Universal-3.6 Pro](https://www.assemblyai.com/docs/voice-agents/livekit-universal-3-6-pro) | Streaming speech-to-text that also decides when the user has finished talking, and holds the turn open while they read out a number or an email. |
 | **Brain** | [LLM Gateway](https://www.assemblyai.com/docs/llm-gateway/quickstart) | 50 models from Google, OpenAI, Anthropic and others, with tool calling, behind one OpenAI-compatible API. |
 
-Using Pipecat? See [assemblyai-pipecat-reference-voice-agent](https://github.com/dan-ince-aai/assemblyai-pipecat-reference-voice-agent).
+Using Pipecat? See [assemblyai-pipecat-reference-voice-agent](https://github.com/AssemblyAI-Solutions/assemblyai-pipecat-reference-voice-agent).
 
 ## Get started
 
