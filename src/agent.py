@@ -44,10 +44,10 @@ AGENT_NAME = "assistant"
 # --- Voice: skills/tts-voice ---
 
 # A voice id from https://www.assemblyai.com/docs/tts/voices, or one of your cloned voices
-TTS_VOICE = "987db62e-a2c2-569a-9c4d-82460cdea1bd"  # Keegan
+TTS_VOICE = "37e65973-9d96-5aab-adcd-01bf56ab5af9"  # Kyla
 
 # The agent introduces itself by the voice's name; if you change one, change the other
-ASSISTANT_NAME = "Keegan"
+ASSISTANT_NAME = "Kyla"
 
 # --- Speech-to-text ---
 

@@ -39,7 +39,7 @@ Wear headphones so the agent doesn't hear itself, or add `--text` to type. Ask w
 export ASSEMBLYAI_API_KEY=<your key>
 curl -sS https://tts.us.assemblyai.com/v1/speech \
   -H "Authorization: $ASSEMBLYAI_API_KEY" -H "Content-Type: application/json" \
-  -d '{"text": "Hi, I am Jane. How can I help?", "voice_id": "aai-jane", "container": "wav"}' \
+  -d '{"text": "Hi, I am Kyla. How can I help?", "voice_id": "37e65973-9d96-5aab-adcd-01bf56ab5af9", "container": "wav"}' \
   -o voice.wav && afplay voice.wav
 ```
 
@@ -61,7 +61,7 @@ Open the repo in Claude Code, Cursor or Codex and describe the agent you want. [
 
 | Building block | Default | Skill |
 |---|---|---|
-| Voice | Keegan | [tts-voice](skills/tts-voice/SKILL.md) |
+| Voice | Kyla | [tts-voice](skills/tts-voice/SKILL.md) |
 | Turn detection | `balanced` | [turn-detection](skills/turn-detection/SKILL.md) |
 | Speech threshold and interruptions | `0.2` | [interruptions-and-vad](skills/interruptions-and-vad/SKILL.md) |
 | Noise suppression | Off | [voice-focus](skills/voice-focus/SKILL.md) |

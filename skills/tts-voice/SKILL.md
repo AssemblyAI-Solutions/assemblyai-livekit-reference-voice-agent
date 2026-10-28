@@ -8,8 +8,8 @@ description: Choose the agent's AssemblyAI text-to-speech voice, find and previe
 The agent speaks with AssemblyAI streaming TTS. The voice is set in `src/agent.py`:
 
 ```python
-TTS_VOICE = "987db62e-a2c2-569a-9c4d-82460cdea1bd"  # Keegan
-ASSISTANT_NAME = "Keegan"
+TTS_VOICE = "37e65973-9d96-5aab-adcd-01bf56ab5af9"  # Kyla
+ASSISTANT_NAME = "Kyla"
 ...
 tts = assemblyai.TTS(voice=TTS_VOICE)
 ```
